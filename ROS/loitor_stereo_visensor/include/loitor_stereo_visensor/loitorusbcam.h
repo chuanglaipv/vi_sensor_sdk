@@ -13,13 +13,26 @@
 #define IMG_SIZE_WVGA 	(IMG_WIDTH_WVGA*IMG_HEIGHT_WVGA)
 #define IMG_BUF_SIZE_WVGA (IMG_SIZE_WVGA+0x200)
 
+/*
+*  camera当前分辨率状态
+*  0-代表VGA
+*  1-代表WVGA
+*/
 extern bool visensor_resolution_status;			// 0-VGA | 1-WVGA
+/*
+*  camera当前通道选择
+*  0-代表开启双目
+*  1-代表只开启右眼
+*  2-代表只开启左眼
+*/
 extern int visensor_cam_selection;				// 0-stereo | 1-right | 2-left
-
 /*
 *  imu 数据
 */
 extern visensor_imudata visensor_imudata_pack;
+/*
+* 相机配置文件路径
+*/
 extern char* visensor_settings_file_name;
 
 // setters & getters

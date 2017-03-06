@@ -1,0 +1,3 @@
+/home/zhy/workspace/usbcam/camprog/vi_sensor_sdk/SDK/build/CMakeFiles/rebuild_cache.dir
+/home/zhy/workspace/usbcam/camprog/vi_sensor_sdk/SDK/build/CMakeFiles/edit_cache.dir
+/home/zhy/workspace/usbcam/camprog/vi_sensor_sdk/SDK/build/CMakeFiles/camtest2.dir

@@ -3,17 +3,22 @@
 
 #include <sys/time.h>
 
+/*
+* IMU 数据结构体
+*/
 typedef struct 
 {
-	float imu_time;		// time-stamp
-	timeval system_time;
-	unsigned char num;
-	float rx,ry,rz;
-	float ax,ay,az;
-	float qw,qx,qy,qz;
-	int timestamp;
+	float imu_time;		// 从camera启动开始之后经历过的时间，以秒为单位
+	timeval system_time;	// 本次IMU数据采集时刻的系统时间
+	unsigned char num;	// 数据编号，从1-200 ，每秒钟归零一次
+	float rx,ry,rz;			// 旋转角速度，单位：角度/s
+	float ax,ay,az;		// 加速度，单位：m/s^2
+	float qw,qx,qy,qz;	// 经过融合滤波之后输出的旋转姿态四元数
 }visensor_imudata;
 
+/*
+*  相机开启时刻的时间戳
+*/
 extern timeval visensor_startTime;
 
 bool visensor_query_imu_update();

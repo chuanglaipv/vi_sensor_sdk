@@ -1,6 +1,5 @@
 #include <cv.h>
 #include <highgui.h>
-#include "cxcore.hpp"
 #include <pthread.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -8,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 #include "loitorusbcam.h"
 #include "loitorimu.h"
@@ -24,28 +24,32 @@ timeval left_stamp,right_stamp;
 // image viewer
 void *opencv_showimg(void*)
 {
-	IplImage *cv_img1;
-	IplImage *cv_img2;
+	cv::Mat img_left;
+	cv::Mat img_right;
+
 	if(!visensor_resolution_status)
 	{
-		cv_img1=cvCreateImage(cvSize(IMG_WIDTH_VGA,IMG_HEIGHT_VGA),IPL_DEPTH_8U,1);
-		cv_img2=cvCreateImage(cvSize(IMG_WIDTH_VGA,IMG_HEIGHT_VGA),IPL_DEPTH_8U,1);
+		img_left.create(cv::Size(640,480),CV_8U);
+		img_right.create(cv::Size(640,480),CV_8U);
+		img_left.data=new unsigned char[IMG_WIDTH_VGA*IMG_HEIGHT_VGA];
+		img_right.data=new unsigned char[IMG_WIDTH_VGA*IMG_HEIGHT_VGA];
 	}
 	else
 	{
-		cv_img1=cvCreateImage(cvSize(IMG_WIDTH_WVGA,IMG_HEIGHT_WVGA),IPL_DEPTH_8U,1);
-		cv_img2=cvCreateImage(cvSize(IMG_WIDTH_WVGA,IMG_HEIGHT_WVGA),IPL_DEPTH_8U,1);
+		img_left.create(cv::Size(752,480),CV_8U);
+		img_right.create(cv::Size(752,480),CV_8U);
+		img_left.data=new unsigned char[IMG_WIDTH_WVGA*IMG_HEIGHT_WVGA];
+		img_right.data=new unsigned char[IMG_WIDTH_WVGA*IMG_HEIGHT_WVGA];
 	}
 	while(!close_img_viewer)
 	{
-		//Cam1
 		if(visensor_cam_selection==2)
 		{
 			if(visensor_is_left_good())
 			{
-				visensor_get_leftImg(cv_img1->imageData,left_stamp);
-				cvShowImage("Left",cv_img1);
-				cvWaitKey(10);
+				visensor_get_leftImg((char *)img_left.data,left_stamp);
+				imshow("left",img_left);
+				cvWaitKey(20);
 			}
 		}
 		//Cam2
@@ -53,9 +57,9 @@ void *opencv_showimg(void*)
 		{
 			if(visensor_is_right_good())
 			{
-				visensor_get_rightImg(cv_img2->imageData,right_stamp);
-				cvShowImage("right",cv_img2);
-				cvWaitKey(10);
+				visensor_get_rightImg((char *)img_right.data,right_stamp);
+				imshow("right",img_right);
+				cvWaitKey(20);
 			}
 		}
 		// Cam1 && Cam2
@@ -63,12 +67,10 @@ void *opencv_showimg(void*)
 		{
 			if(visensor_is_stereo_good())
 			{
-				visensor_get_stereoImg(cv_img1->imageData,cv_img2->imageData,left_stamp,right_stamp);
-				cout<<"left_time : "<<left_stamp.tv_usec<<endl;
-				cout<<"right_time : "<<right_stamp.tv_usec<<endl<<endl;
-				cvShowImage("Left",cv_img1);
-				cvShowImage("Right",cv_img2);
-				cvWaitKey(10);
+				visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
+				imshow("left",img_left);
+				imshow("right",img_right);
+				cvWaitKey(20);
 			}
 		}
 	}
@@ -86,9 +88,10 @@ void* show_imuData(void *)
 			// 每隔20帧显示一次imu数据
 			if(counter>=20)
 			{
+				
 				cout<<"visensor_imudata_pack->a : "<<visensor_imudata_pack.ax<<" , "<<visensor_imudata_pack.ay<<" , "<<visensor_imudata_pack.az<<endl;
-				//cout<<"imu_time : "<<visensor_imudata_pack.imu_time<<endl;
-				cout<<"imu_time : "<<visensor_imudata_pack.system_time.tv_usec<<endl;
+				cout<<"imu_time1 : "<<visensor_imudata_pack.imu_time<<endl;
+				cout<<"imu_time2 : "<<visensor_imudata_pack.system_time.tv_usec<<endl;
 				counter=0;
 			}
 		}

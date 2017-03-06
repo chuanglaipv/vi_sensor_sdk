@@ -32,7 +32,7 @@ autoexp_manualgain,300,5,58,100
 /dev/ttyUSB0,5
 #
 IMU-acc-bias
-Gx,445
-Gy,-62
-Gz,-314
+Gx,346
+Gy,129
+Gz,-1616
 #

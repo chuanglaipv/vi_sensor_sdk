@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="camtest2">
+  <Project Name="camtest2" Path="camtest2.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="NoConfig" Selected="yes">
+      <Project Name="camtest2" ConfigName="NoConfig"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
