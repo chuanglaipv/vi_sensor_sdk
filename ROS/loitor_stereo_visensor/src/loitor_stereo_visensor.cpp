@@ -30,8 +30,8 @@ ros::Publisher pub_imu;
 /*
 *  用于构造cv::Mat 的左右眼图像
 */
-IplImage *left_img;
-IplImage *right_img;
+cv::Mat img_left;
+cv::Mat img_right;
 
 /*
 *  当前左右图像的时间戳
@@ -118,13 +118,17 @@ int main(int argc, char **argv)
 	// 创建用来接收camera数据的图像
 	if(!visensor_resolution_status)
 	{
-		left_img=cvCreateImage(cvSize(IMG_WIDTH_VGA,IMG_HEIGHT_VGA),IPL_DEPTH_8U,1);
-		right_img=cvCreateImage(cvSize(IMG_WIDTH_VGA,IMG_HEIGHT_VGA),IPL_DEPTH_8U,1);
+		img_left.create(cv::Size(640,480),CV_8U);
+		img_right.create(cv::Size(640,480),CV_8U);
+		img_left.data=new unsigned char[IMG_WIDTH_VGA*IMG_HEIGHT_VGA];
+		img_right.data=new unsigned char[IMG_WIDTH_VGA*IMG_HEIGHT_VGA];
 	}
 	else
 	{
-		left_img=cvCreateImage(cvSize(IMG_WIDTH_WVGA,IMG_HEIGHT_WVGA),IPL_DEPTH_8U,1);
-		right_img=cvCreateImage(cvSize(IMG_WIDTH_WVGA,IMG_HEIGHT_WVGA),IPL_DEPTH_8U,1);
+		img_left.create(cv::Size(752,480),CV_8U);
+		img_right.create(cv::Size(752,480),CV_8U);
+		img_left.data=new unsigned char[IMG_WIDTH_WVGA*IMG_HEIGHT_WVGA];
+		img_right.data=new unsigned char[IMG_WIDTH_WVGA*IMG_HEIGHT_WVGA];
 	}
 	float hardware_fps=visensor_get_hardware_fps();
 	/************************** Start IMU **************************/
@@ -170,14 +174,11 @@ int main(int argc, char **argv)
 		if(visensor_cam_selection==0)
 		{
 			while(!visensor_is_stereo_good())usleep(1000);
-			visensor_get_stereoImg(left_img->imageData,right_img->imageData,left_stamp,right_stamp);
 
-			// 用于构造msg的临时图像
-			cv::Mat frame_left(left_img);
-			cv::Mat frame_right(right_img);
+			visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
 
-			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", frame_left);
-			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", frame_right);
+			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_left);
+			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_right);
 
 			// 加时间戳
 			ros::Time msg_time;
@@ -199,18 +200,13 @@ int main(int argc, char **argv)
 			//cout<<"left_time : "<<left_stamp.tv_usec<<endl;
 			//cout<<"right_time : "<<right_stamp.tv_usec<<endl<<endl;
 
-			// free image
-			frame_left.release();
-			frame_right.release();
 		}
 		else if(visensor_cam_selection==1)
 		{
 			while(!visensor_is_right_good())usleep(1000);
-			visensor_get_rightImg(right_img->imageData,right_stamp);
-			// 用于构造msg的临时图像
-			cv::Mat frame_right(right_img);
+			visensor_get_rightImg((char *)img_right.data,right_stamp);
 
-			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", frame_right);
+			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_right);
 
 			// 加时间戳
 			ros::Time msg1_time;
@@ -221,17 +217,13 @@ int main(int argc, char **argv)
 			msg1 = t_right.toImageMsg();
 			
 			pub1.publish(msg1);
-			// free image
-			frame_right.release();
 		}
 		else if(visensor_cam_selection==2)
 		{
 			while(!visensor_is_left_good())usleep(1000);
-			visensor_get_leftImg(left_img->imageData,left_stamp);
-			// 用于构造msg的临时图像
-			cv::Mat frame_left(left_img);
+			visensor_get_leftImg((char *)img_left.data,left_stamp);
 
-			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", frame_left);
+			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_left);
 
 			// 加时间戳
 			ros::Time msg_time;
@@ -241,8 +233,6 @@ int main(int argc, char **argv)
 			
 			msg = t_left.toImageMsg();
 			pub.publish(msg);
-			// free image
-			frame_left.release();
 		}
 
 		ros::spinOnce(); 

@@ -30,10 +30,6 @@ extern int visensor_cam_selection;				// 0-stereo | 1-right | 2-left
 *  imu 数据
 */
 extern visensor_imudata visensor_imudata_pack;
-/*
-* 相机配置文件路径
-*/
-extern char* visensor_settings_file_name;
 
 // setters & getters
 void visensor_set_auto_EG(int E_AG);			// 0-ManEG | 1-AutoEG with limits | 2-AutoE&ManG | 3- fully auto
@@ -63,7 +59,7 @@ int visensor_get_cam_selection_mode();
 float visensor_get_imu_G_bias_x();
 float visensor_get_imu_G_bias_y();
 float visensor_get_imu_G_bias_z();
-char* visensor_get_imu_portname();
+const char* visensor_get_imu_portname();
 
 void visensor_save_current_settings();
 
