@@ -57,7 +57,7 @@ void* imu_data_stream(void *)
 			// 每隔20帧显示一次imu数据
 			if(counter>=20)
 			{
-				cout<<"visensor_imudata_pack->a : "<<visensor_imudata_pack.ax<<" , "<<visensor_imudata_pack.ay<<" , "<<visensor_imudata_pack.az<<endl;
+				//cout<<"visensor_imudata_pack->a : "<<visensor_imudata_pack.ax<<" , "<<visensor_imudata_pack.ay<<" , "<<visensor_imudata_pack.az<<endl;
 				//cout<<"imu_time : "<<visensor_imudata_pack.imu_time<<endl;
 				//cout<<"imu_time : "<<visensor_imudata_pack.system_time.tv_usec<<endl;
 				counter=0;
@@ -173,9 +173,13 @@ int main(int argc, char **argv)
 
 		if(visensor_cam_selection==0)
 		{
-			while(!visensor_is_stereo_good())usleep(1000);
 
-			visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
+			visensor_imudata paired_imu=visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"left_time : "<<left_stamp.tv_usec<<endl;
+			cout<<"right_time : "<<right_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
 
 			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_left);
 			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_right);
@@ -203,8 +207,11 @@ int main(int argc, char **argv)
 		}
 		else if(visensor_cam_selection==1)
 		{
-			while(!visensor_is_right_good())usleep(1000);
-			visensor_get_rightImg((char *)img_right.data,right_stamp);
+			visensor_imudata paired_imu=visensor_get_rightImg((char *)img_right.data,right_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"right_time : "<<right_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
 
 			cv_bridge::CvImage t_right=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_right);
 
@@ -220,8 +227,11 @@ int main(int argc, char **argv)
 		}
 		else if(visensor_cam_selection==2)
 		{
-			while(!visensor_is_left_good())usleep(1000);
-			visensor_get_leftImg((char *)img_left.data,left_stamp);
+			visensor_imudata paired_imu=visensor_get_leftImg((char *)img_left.data,left_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"left_time : "<<left_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
 
 			cv_bridge::CvImage t_left=cv_bridge::CvImage(std_msgs::Header(), "mono8", img_left);
 

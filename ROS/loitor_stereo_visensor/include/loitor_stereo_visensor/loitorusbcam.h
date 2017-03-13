@@ -74,14 +74,17 @@ bool visensor_is_right_good();
 bool visensor_is_left_fresh();
 bool visensor_is_right_fresh();
 
-void visensor_get_stereoImg(char* left_img,char* right_img);
-void visensor_get_stereoImg(char* left_img,char* right_img,timeval &left_stamp,timeval &right_stamp);
+/*
+* 得到绑定了同步IMU数据之后的图像数据
+*/
+visensor_imudata visensor_get_stereoImg(char* left_img,char* right_img);
+visensor_imudata visensor_get_stereoImg(char* left_img,char* right_img,timeval &left_stamp,timeval &right_stamp);
 
-void visensor_get_leftImg(char* left_img);
-void visensor_get_leftImg(char* left_img,timeval &left_stamp);
+visensor_imudata visensor_get_leftImg(char* left_img);
+visensor_imudata visensor_get_leftImg(char* left_img,timeval &left_stamp);
 
-void visensor_get_rightImg(char* right_img);
-void visensor_get_rightImg(char* right_img,timeval &right_stamp);
+visensor_imudata visensor_get_rightImg(char* right_img);
+visensor_imudata visensor_get_rightImg(char* right_img,timeval &right_stamp);
 
 int visensor_Start_Cameras();
 void visensor_Close_Cameras();

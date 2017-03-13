@@ -12,10 +12,6 @@
 #include "loitorusbcam.h"
 #include "loitorimu.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 using namespace std;
 using namespace cv;
 
@@ -49,37 +45,45 @@ void *opencv_showimg(void*)
 	{
 		if(visensor_cam_selection==2)
 		{
-			if(visensor_is_left_good())
-			{
-				visensor_get_leftImg((char *)img_left.data,left_stamp);
-				imshow("left",img_left);
-				cvWaitKey(20);
-			}
+			visensor_imudata paired_imu=visensor_get_leftImg((char *)img_left.data,left_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"left_time : "<<left_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
+
+			imshow("left",img_left);
+			cvWaitKey(1);
 		}
 		//Cam2
 		else if(visensor_cam_selection==1)
 		{
-			if(visensor_is_right_good())
-			{
-				visensor_get_rightImg((char *)img_right.data,right_stamp);
-				imshow("right",img_right);
-				cvWaitKey(20);
-			}
+			visensor_imudata paired_imu=visensor_get_rightImg((char *)img_right.data,right_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"right_time : "<<right_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
+
+			imshow("right",img_right);
+			cvWaitKey(1);
 		}
 		// Cam1 && Cam2
 		else if(visensor_cam_selection==0)
 		{
-			if(visensor_is_stereo_good())
-			{
-				visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
-				imshow("left",img_left);
-				imshow("right",img_right);
-				cvWaitKey(20);
-			}
+			visensor_imudata paired_imu=visensor_get_stereoImg((char *)img_left.data,(char *)img_right.data,left_stamp,right_stamp);
+
+			// 显示同步数据的时间戳（单位微秒）
+			cout<<"left_time : "<<left_stamp.tv_usec<<endl;
+			cout<<"right_time : "<<right_stamp.tv_usec<<endl;
+			cout<<"paired_imu time ===== "<<paired_imu.system_time.tv_usec<<endl<<endl;
+
+			imshow("left",img_left);
+			imshow("right",img_right);
+			cvWaitKey(1);
 		}
 	}
 	pthread_exit(NULL);
 }
+
 
 void* show_imuData(void *)
 {
@@ -92,10 +96,13 @@ void* show_imuData(void *)
 			// 每隔20帧显示一次imu数据
 			if(counter>=20)
 			{
-				
-				cout<<"visensor_imudata_pack->a : "<<visensor_imudata_pack.ax<<" , "<<visensor_imudata_pack.ay<<" , "<<visensor_imudata_pack.az<<endl;
-				cout<<"imu_time1 : "<<visensor_imudata_pack.imu_time<<endl;
-				cout<<"imu_time2 : "<<visensor_imudata_pack.system_time.tv_usec<<endl;
+				float ax=visensor_imudata_pack.ax;
+				float ay=visensor_imudata_pack.ay;
+				float az=visensor_imudata_pack.az;
+				cout<<"visensor_imudata_pack->a : "<<sqrt(ax*ax+ay*ay+az*az)<<endl;
+				//cout<<"visensor_imudata_pack->a : "<<visensor_imudata_pack.ax<<" , "<<visensor_imudata_pack.ay<<" , "<<visensor_imudata_pack.az<<endl;
+				//cout<<"imu_time1 : "<<visensor_imudata_pack.imu_time<<endl;
+				//cout<<"imu_time2 : "<<visensor_imudata_pack.system_time.tv_usec<<endl;
 				counter=0;
 			}
 		}
@@ -152,8 +159,8 @@ int main(int argc, char* argv[])
 	while(1)
 	{
 		// Do - Nothing :)
-		cout<<visensor_get_imu_portname()<<endl;
-		cout<<visensor_get_hardware_fps()<<endl;
+		//cout<<visensor_get_imu_portname()<<endl;
+		//cout<<visensor_get_hardware_fps()<<endl;
 		usleep(500000);
 	}
 
